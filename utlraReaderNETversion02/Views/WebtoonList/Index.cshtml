@@ -1,0 +1,16 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<Webtoon>
+
+<h1>Webtoonlar</h1>
+
+@foreach (var webtoon in Model)
+{
+    <div class="webtoon-item">
+        <a href="@Url.Action("Details", "Webtoon", new { name = webtoon.Name })">
+            @webtoon.DisplayName
+        </a>
+    </div>
+}

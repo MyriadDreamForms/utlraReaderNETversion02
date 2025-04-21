@@ -1,0 +1,96 @@
+﻿@model ReaderViewModel
+@{
+    ViewData["Title"] = Model != null ? $"{Model.WebtoonName} - {Model.ChapterName}" : "Webtoon Okuyucu";
+
+    if (Model != null)
+    {
+        ViewData["og:title"] = Model.WebtoonName;
+        ViewData["og:description"] = $"Şu anda okuyorsunuz: {Model.ChapterName}";
+        ViewData["og:image"] = Model.Images?.Count > 0
+            ? Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{Model.Images.First()}")
+            : "";
+    }
+}
+
+<div class="container-fluid bg-dark min-vh-100">
+    @if (Model == null)
+    {
+        <div class="alert alert-danger mt-5">Webtoon yüklenirken bir hata oluştu.</div>
+    }
+    else
+    {
+        <!-- Üst Bilgi -->
+        <nav class="navbar navbar-dark bg-black fixed-top">
+            <div class="container">
+                <a href="@Url.Action("Details", "Webtoon", new { name = Model.WebtoonName })"
+                   class="navbar-brand">@Model.WebtoonName</a>
+                <span class="navbar-text text-light">
+                    Bölüm: @Model.ChapterName
+                </span>
+            </div>
+        </nav>
+
+        <!-- Resimler -->
+        <div class="pt-5">
+            @if (Model.Images?.Count > 0)
+            {
+                foreach (var image in Model.Images)
+                {
+                    <img src="~/webtoons/@Model.WebtoonName/@Model.ChapterName/@image"
+                         class="img-fluid w-100 mb-3"
+                         alt="Sayfa @Model.Images.IndexOf(image)"
+                         loading="lazy">
+                }
+            }
+            else
+            {
+                <div class="alert alert-danger mt-5">Bu bölümde hiç sayfa bulunamadı.</div>
+            }
+        </div>
+
+        <!-- Alt Navigasyon -->
+        <nav class="navbar navbar-dark bg-black fixed-bottom">
+            <div class="container justify-content-between">
+                @if (!string.IsNullOrEmpty(Model.PreviousChapter))
+                {
+                    <a href="@Url.Action("Index", "Reader", new { webtoon = Model.WebtoonName, chapter = Model.PreviousChapter })"
+                       class="btn btn-outline-light">
+                        ← Önceki Bölüm
+                    </a>
+                }
+                else
+                {
+                    <span class="btn btn-outline-secondary disabled">← Önceki Bölüm</span>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.NextChapter))
+                {
+                    <a href="@Url.Action("Index", "Reader", new { webtoon = Model.WebtoonName, chapter = Model.NextChapter })"
+                       class="btn btn-outline-light">
+                        Sonraki Bölüm →
+                    </a>
+                }
+                else
+                {
+                    <span class="btn btn-outline-secondary disabled">Sonraki Bölüm →</span>
+                }
+            </div>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    @if (Model?.Images != null)
+    {
+        <script>
+            window.addEventListener('load', function() {
+            @foreach (var image in Model.Images)
+            {
+                <text>
+                        new Image().src = "@Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{image}")";
+                </text>
+            }
+            });
+        </script>
+    }
+}

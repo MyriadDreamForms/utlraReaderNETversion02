@@ -1,0 +1,23 @@
+﻿@model WebtoonInfo
+@{
+    var chapters = ViewData["Chapters"] as List<string>;
+    var webtoonName = ViewData["WebtoonName"] as string;
+}
+
+@if (chapters?.Count > 0)
+{
+    <ul>
+        @foreach (var chapter in chapters)
+        {
+            <li>
+                <a href="@Url.Action("Index", "Reader", new { webtoon = ViewData["WebtoonName"], chapter = chapter })">
+                    @chapter
+                </a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Henüz bölüm eklenmemiş.</p>
+}

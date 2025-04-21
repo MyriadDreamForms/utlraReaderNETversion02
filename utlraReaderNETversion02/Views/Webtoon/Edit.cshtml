@@ -1,0 +1,42 @@
+﻿@model WebtoonInfo
+@{
+    ViewData["Title"] = "Webtoon Bilgilerini Düzenle";
+    var webtoonName = ViewData["WebtoonName"] as string;
+}
+
+<h2 class="mb-4">📘 @Model.Title Bilgilerini Düzenle</h2>
+
+<form asp-action="Edit" asp-controller="Webtoon" asp-route-name="@webtoonName" method="post">
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label">Başlık</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Author" class="form-label">Yazar</label>
+        <input asp-for="Author" class="form-control" />
+        <span asp-validation-for="Author" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Açıklama</label>
+        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Cover" class="form-label">Kapak Dosyası Adı (örn: cover.jpg)</label>
+        <input asp-for="Cover" class="form-control" />
+        <span asp-validation-for="Cover" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">💾 Kaydet</button>
+    <a asp-action="Details" asp-route-name="@webtoonName" class="btn btn-secondary ms-2">İptal</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
