@@ -1,72 +1,90 @@
 ﻿@model WebtoonInfo
 @{
-    var chapters = ViewData["Chapters"] as List<string>;
+    // Webtoon ismi ve bölüm listesi ViewData'dan alınıyor
     var webtoonName = ViewData["WebtoonName"] as string;
+    var chapters = ViewData["Chapters"] as List<string>;
     Layout = "_Layout";
 }
 
-@foreach (var chapter in chapters)
-{
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>@chapter</span>
-        <div class="d-flex gap-2">
-            <a href="@Url.Action("Index", "Reader", new { webtoon = webtoonName, chapter = chapter })" class="btn btn-sm btn-primary">Oku</a>
+<div class="container mt-4">
 
-            <form method="post" asp-action="DeleteChapter" asp-controller="Webtoon" class="d-inline"
-                  asp-route-webtoon="@webtoonName" asp-route-chapter="@chapter"
-                  onsubmit="return confirm('@chapter bölümünü silmek istediğinize emin misiniz?');">
-                <button type="submit" class="btn btn-sm btn-danger">Sil</button>
-            </form>
+    <!-- TempData Mesajları (Başarı / Hata) -->
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Message"]
         </div>
-    </li>
-}
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
 
-<a href="@Url.Action("AddChapter", "Webtoon", new { name = webtoonName })" class="btn btn-success mt-3">
-    ➕ Yeni Bölüm Ekle
-</a>
-
-
-<div class="container mt-5">
-
-    <div class="row mb-4">
-        <!-- Sol: Kapak -->
+    <!-- Webtoon Bilgi Bölümü -->
+    <div class="row mb-5">
+        <!-- Sol: Kapak Görseli -->
         <div class="col-md-4 text-center">
             @if (!string.IsNullOrEmpty(Model.Cover))
             {
-                <img src="~/webtoons/@webtoonName/@Model.Cover" alt="Kapak" class="img-fluid rounded shadow" style="max-height: 400px;" />
+                <img src="@Url.Content($"~/webtoons/{webtoonName}/{Model.Cover}")"
+                     class="img-fluid rounded shadow" alt="Kapak Görseli" />
+            }
+            else
+            {
+                <!-- Varsayılan bir kapak görseli varsa -->
+                <img src="@Url.Content("~/images/default-cover.jpg")"
+                     class="img-fluid rounded shadow" alt="Varsayılan Kapak" />
             }
         </div>
-
-        <!-- Sağ: Bilgi -->
+        <!-- Sağ: Bilgi ve İşlem Butonları -->
         <div class="col-md-8 d-flex flex-column justify-content-center">
-            <h2>@Model.Title</h2>
+            <h2 class="mb-2">@Model.Title</h2>
             <p class="text-muted">@Model.Description</p>
-
-            <a href="@Url.Action("Edit", "Webtoon", new { name = webtoonName })" class="btn btn-warning mt-3" style="max-width: 200px;">Düzenle</a>
+            <div class="d-flex gap-2">
+                <a href="@Url.Action("Edit", "Webtoon", new { name = webtoonName })" class="btn btn-warning">
+                    ✏️ Düzenle
+                </a>
+                <a href="@Url.Action("AddChapter", "Webtoon", new { name = webtoonName })" class="btn btn-success">
+                    ➕ Yeni Bölüm Ekle
+                </a>
+            </div>
         </div>
     </div>
 
     <hr />
 
-    <!-- Bölümler -->
+    <!-- Bölüm Listesi -->
     <h4 class="mb-3">Bölümler</h4>
-
     @if (chapters?.Count > 0)
     {
-        <ul class="list-group">
+        <div class="list-group">
             @foreach (var chapter in chapters)
             {
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>@chapter</span>
-                    <a href="@Url.Action("Index", "Reader", new { webtoon = webtoonName, chapter = chapter })" class="btn btn-sm btn-primary">Oku</a>
-
-                </li>
+                <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                    <strong>@chapter</strong>
+                    <div class="d-flex gap-2 mt-2 mt-sm-0">
+                        <a href="@Url.Action("Index", "Reader", new { webtoon = webtoonName, chapter = chapter })"
+                           class="btn btn-sm btn-primary">
+                            📖 Oku
+                        </a>
+                        <form method="post" asp-action="DeleteChapter" asp-controller="Webtoon" class="d-inline"
+                              asp-route-webtoon="@webtoonName" asp-route-chapter="@chapter"
+                              onsubmit="return confirm('@chapter bölümünü silmek istediğinize emin misiniz?');">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                🗑️ Sil
+                            </button>
+                        </form>
+                    </div>
+                </div>
             }
-        </ul>
+        </div>
     }
     else
     {
-        <p>Henüz bölüm eklenmemiş.</p>
+        <div class="alert alert-info mt-3">
+            Henüz bölüm eklenmemiş.
+        </div>
     }
-
 </div>
