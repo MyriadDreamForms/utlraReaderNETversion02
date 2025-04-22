@@ -1,0 +1,65 @@
+﻿@model utlraReaderNETversion02.Models.ViewModels.EditChapterViewModel
+
+@{
+    ViewData["Title"] = "Bölüm Düzenle";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <h2>@Model.WebtoonName - '@Model.ChapterName' Bölümünü Düzenle</h2>
+
+    <form asp-action="EditChapter" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="WebtoonName" />
+        <input type="hidden" asp-for="ChapterName" />
+
+        <div class="mb-3">
+            <label class="form-label">Bölüm Adı (Güncellemek istiyorsanız)</label>
+            <input type="text" class="form-control" name="NewChapterName" placeholder="Yeni bölüm adı (opsiyonel)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mevcut Görseller</label>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Görsel</th>
+                        <th>Eski Ad</th>
+                        <th>Yeni Ad</th>
+                        <th>Sil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.ExistingImages.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{Model.ExistingImages[i].FileName}")" width="80" class="img-thumbnail" />
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => m.ExistingImages[i].FileName)
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" asp-for="ExistingImages[@i].NewName" value="@Model.ExistingImages[i].NewName" />
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" asp-for="ExistingImages[@i].Delete" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Yeni Görseller Ekle</label>
+            <input asp-for="NewImages" type="file" multiple class="form-control" />
+            <span asp-validation-for="NewImages" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Kaydet</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

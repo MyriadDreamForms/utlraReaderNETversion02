@@ -305,6 +305,111 @@ namespace utlraReaderNETversion02.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult EditChapter(string webtoon, string chapter)
+        {
+            if (string.IsNullOrWhiteSpace(webtoon) || string.IsNullOrWhiteSpace(chapter))
+                return BadRequest("Gerekli parametreler eksik.");
+
+            string chapterPath = Path.Combine(_env.WebRootPath, "webtoons", webtoon, chapter);
+
+
+            var files = Directory.GetFiles(chapterPath)
+                                 .Where(f => f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+                                          || f.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                                 .Select(Path.GetFileName)
+                                 .OrderBy(x => x, new NumericAndTextComparer())
+                                 .ToList();
+
+            var existingImages = files.Select(f => new ChapterImageViewModel
+            {
+                FileName = f,
+                NewName = f,
+                Delete = false
+            }).ToList();
+
+            var model = new Models.ViewModels.EditChapterViewModel
+            {
+                WebtoonName = webtoon,
+                ChapterName = chapter,
+                ExistingImages = existingImages
+            };
+
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditChapter(Models.ViewModels.EditChapterViewModel model)
+        {
+            // İlk olarak, geçerli bölüm klasörünü bulalım.
+            string currentChapterPath = Path.Combine(_env.WebRootPath, "webtoons", model.WebtoonName, model.ChapterName);
+            if (!Directory.Exists(currentChapterPath))
+                return NotFound("Bölüm klasörü bulunamadı.");
+
+            // Eğer admin bölüm adını değiştirmek istiyorsa:
+            if (!string.IsNullOrWhiteSpace(model.NewChapterName) &&
+                 !model.NewChapterName.Equals(model.ChapterName, StringComparison.OrdinalIgnoreCase))
+            {
+                string newChapterPath = Path.Combine(_env.WebRootPath, "webtoons", model.WebtoonName, model.NewChapterName);
+                if (Directory.Exists(newChapterPath))
+                {
+                    ModelState.AddModelError("", "Yeni bölüm adı zaten kullanılıyor.");
+                    return View(model);
+                }
+                // Klasörü yeniden adlandır
+                Directory.Move(currentChapterPath, newChapterPath);
+                // Güncel klasör yolunu ve bölüm adını güncelle
+                currentChapterPath = newChapterPath;
+                model.ChapterName = model.NewChapterName;
+            }
+
+            // Mevcut görseller üzerinde düzenleme yap: silme veya yeniden adlandırma
+            foreach (var image in model.ExistingImages)
+            {
+                string filePath = Path.Combine(currentChapterPath, image.FileName);
+                // Eğer silinmesi isteniyorsa
+                if (image.Delete)
+                {
+                    if (System.IO.File.Exists(filePath))
+                        System.IO.File.Delete(filePath);
+                }
+                else if (!image.NewName.Equals(image.FileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Eğer yeni isim verilmişse, dosyayı yeniden adlandır
+                    string newFilePath = Path.Combine(currentChapterPath, image.NewName);
+                    if (System.IO.File.Exists(filePath))
+                        System.IO.File.Move(filePath, newFilePath);
+                }
+            }
+
+            // Yeni görselleri yükle
+            if (model.NewImages != null && model.NewImages.Count > 0)
+            {
+                // Yeni dosyaların numaralandırması için mevcut dosya sayısını alalım
+                int index = Directory.GetFiles(currentChapterPath)
+                                     .Count(f => f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+                                               || f.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) + 1;
+                foreach (var file in model.NewImages.OrderBy(f => f.FileName))
+                {
+                    if (file.Length > 0)
+                    {
+                        var extension = Path.GetExtension(file.FileName);
+                        var fileName = $"{index:D3}{extension}";
+                        var filePath = Path.Combine(currentChapterPath, fileName);
+                        using var stream = new FileStream(filePath, FileMode.Create);
+                        await file.CopyToAsync(stream);
+                        index++;
+                    }
+                }
+            }
+
+            TempData["Message"] = "Bölüm başarıyla güncellendi.";
+            return RedirectToAction("Details", new { name = model.WebtoonName });
+        }
+
+
+
+
+
 
 
 
