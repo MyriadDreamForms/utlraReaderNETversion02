@@ -202,7 +202,7 @@ namespace utlraReaderNETversion02.Controllers
         }
 
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult AddChapter(string name)
         {
             return View(new AddChapterViewModel { WebtoonName = name });

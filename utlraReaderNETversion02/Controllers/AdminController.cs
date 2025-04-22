@@ -12,37 +12,39 @@ namespace utlraReaderNETversion02.Controllers
     public class AdminController : Controller
     {
         private const string AdminUsername = "admin";
-        private const string AdminPassword = "1234";
+        private const string AdminPassword = "1234"; // Not: Sabit şifre kullanımını geliştirme aşamasında kullanın; prod'da hash’li saklayın
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl)
         {
+            if (!ModelState.IsValid)
+                return View(model);
 
-            if (ModelState.IsValid)
-            {
-                // Giriş işlemi
-                return RedirectToAction("Dashboard", "Admin");
-            }
-
-            // Geçici olarak sabit kullanıcı adı ve şifre
-            if (model.Username == "admin" && model.Password == "123456")
+            // Sabit kullanıcı adı ve şifrenin kontrolü
+            if (model.Username == AdminUsername && model.Password == "123456") // Not: Şifrenizi uyuşacak şekilde ayarlayın
             {
                 var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, model.Username),
-                new Claim(ClaimTypes.Role, "Admin")
-            };
+                {
+                    new Claim(ClaimTypes.Name, model.Username),
+                    new Claim(ClaimTypes.Role, "Admin")
+                };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                // Eğer returnUrl varsa ve yerel ise ona yönlendir, yoksa Dashboard'a yönlendir
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    return Redirect(returnUrl);
 
                 return RedirectToAction("Dashboard", "Admin");
             }

@@ -1,27 +1,23 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+ï»¿using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
-// Authentication and Authorization setup
+// ðŸ›  Authentication ve Authorization servisleri
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Admin/Login"; // Admin giriþine yönlendir
-        options.AccessDeniedPath = "/Admin/Login"; // Eriþim reddedildiðinde yönlendirme
-        options.LogoutPath = "/Admin/Logout"; // Admin çýkýþý
+        options.LoginPath = "/Admin/Login";
+        options.AccessDeniedPath = "/Admin/Login";
+        options.LogoutPath = "/Admin/Logout";
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("Admin", policy => policy.RequireRole("Admin")); // Admin rolüne özel eriþim
-});
+builder.Services.AddAuthorization(); // (isteÄŸe baÄŸlÄ±, ama iyi olur)
+
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ðŸ“¦ Middleware sÄ±ralamasÄ±
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -33,8 +29,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // Authentication middleware
-app.UseAuthorization(); // Authorization middleware
+// ðŸ§  Kimlik DoÄŸrulama ve Yetkilendirme sÄ±rasÄ± Ã–NEMLÄ°
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

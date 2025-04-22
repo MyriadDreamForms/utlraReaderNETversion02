@@ -13,12 +13,15 @@
         <div class="mb-3">
             <label asp-for="Username" class="form-label">Kullanıcı Adı</label>
             <input asp-for="Username" class="form-control" />
+            <span asp-validation-for="Username" class="text-danger" />
         </div>
+
         <div class="mb-3">
             <label asp-for="Password" class="form-label">Şifre</label>
-            <input asp-for="Password" class="form-control" type="password" />
+            <input asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger" />
         </div>
+
         <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
     </form>
-
 </div>
