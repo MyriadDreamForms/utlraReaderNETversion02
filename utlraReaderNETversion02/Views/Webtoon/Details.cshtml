@@ -5,6 +5,27 @@
     Layout = "_Layout";
 }
 
+@foreach (var chapter in chapters)
+{
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>@chapter</span>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Index", "Reader", new { webtoon = webtoonName, chapter = chapter })" class="btn btn-sm btn-primary">Oku</a>
+
+            <form method="post" asp-action="DeleteChapter" asp-controller="Webtoon" class="d-inline"
+                  asp-route-webtoon="@webtoonName" asp-route-chapter="@chapter"
+                  onsubmit="return confirm('@chapter bölümünü silmek istediğinize emin misiniz?');">
+                <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+            </form>
+        </div>
+    </li>
+}
+
+<a href="@Url.Action("AddChapter", "Webtoon", new { name = webtoonName })" class="btn btn-success mt-3">
+    ➕ Yeni Bölüm Ekle
+</a>
+
+
 <div class="container mt-5">
 
     <div class="row mb-4">

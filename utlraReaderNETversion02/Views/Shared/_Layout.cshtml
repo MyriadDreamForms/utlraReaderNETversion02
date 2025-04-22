@@ -19,6 +19,33 @@
         }
     </style>
 </head>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <a href="/Admin/Logout" class="text-white ms-3">Çıkış Yap</a>
+}
+else
+{
+    <a href="/Admin/Login" class="text-white ms-3">Admin Giriş</a>
+}
+
+
+@if (User.Identity.IsAuthenticated)
+{
+    <a href="/Admin/Dashboard" class="text-white me-3">Dashboard</a>
+    <a href="/Admin/Logout" class="text-white">Çıkış</a>
+}
+else
+{
+    <a href="/Admin/Login" class="text-white">Admin Giriş</a>
+}
+
+
+
+
+
+
+
 <body class="d-flex flex-column min-vh-100">
 
     <!-- Navbar -->

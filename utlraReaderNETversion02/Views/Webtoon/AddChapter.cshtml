@@ -1,0 +1,32 @@
+﻿@using utlraReaderNETversion02.Models.ViewModels
+@model AddChapterViewModel
+@{
+    ViewData["Title"] = "Yeni Bölüm Ekle";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <h2>Yeni Bölüm Ekle - @Model.WebtoonName</h2>
+
+    <form asp-action="AddChapter" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="WebtoonName" />
+
+        <div class="mb-3">
+            <label asp-for="ChapterName" class="form-label">Bölüm Adı</label>
+            <input asp-for="ChapterName" class="form-control" />
+            <span asp-validation-for="ChapterName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Images" class="form-label">Görseller (.jpg, .png)</label>
+            <input asp-for="Images" type="file" class="form-control" multiple />
+            <span asp-validation-for="Images" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Kaydet</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

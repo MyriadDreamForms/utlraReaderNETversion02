@@ -1,0 +1,29 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Yeni Webtoon Ekle";
+}
+
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="mb-4">Yeni Webtoon Oluştur</h2>
+
+    @if (!string.IsNullOrEmpty(ViewBag.Error))
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form method="post" asp-action="Create" asp-controller="Webtoon">
+        <div class="mb-3">
+            <label for="name" class="form-label">Klasör Adı (İngilizce, boşluksuz)</label>
+            <input type="text" name="name" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="displayName" class="form-label">Görünen Ad</label>
+            <input type="text" name="displayName" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Açıklama</label>
+            <textarea name="description" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-dark w-100">Oluştur</button>
+    </form>
+</div>
