@@ -2,22 +2,50 @@
 @{
     var chapters = ViewData["Chapters"] as List<string>;
     var webtoonName = ViewData["WebtoonName"] as string;
+    Layout = "_Layout";
 }
 
-@if (chapters?.Count > 0)
-{
-    <ul>
-        @foreach (var chapter in chapters)
-        {
-            <li>
-                <a href="@Url.Action("Index", "Reader", new { webtoon = ViewData["WebtoonName"], chapter = chapter })">
-                    @chapter
-                </a>
-            </li>
-        }
-    </ul>
-}
-else
-{
-    <p>Henüz bölüm eklenmemiş.</p>
-}
+<div class="container mt-5">
+
+    <div class="row mb-4">
+        <!-- Sol: Kapak -->
+        <div class="col-md-4 text-center">
+            @if (!string.IsNullOrEmpty(Model.Cover))
+            {
+                <img src="~/webtoons/@webtoonName/@Model.Cover" alt="Kapak" class="img-fluid rounded shadow" style="max-height: 400px;" />
+            }
+        </div>
+
+        <!-- Sağ: Bilgi -->
+        <div class="col-md-8 d-flex flex-column justify-content-center">
+            <h2>@Model.Title</h2>
+            <p class="text-muted">@Model.Description</p>
+
+            <a href="@Url.Action("Edit", "Webtoon", new { name = webtoonName })" class="btn btn-warning mt-3" style="max-width: 200px;">Düzenle</a>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- Bölümler -->
+    <h4 class="mb-3">Bölümler</h4>
+
+    @if (chapters?.Count > 0)
+    {
+        <ul class="list-group">
+            @foreach (var chapter in chapters)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>@chapter</span>
+                    <a href="@Url.Action("Index", "Reader", new { webtoon = webtoonName, chapter = chapter })" class="btn btn-sm btn-primary">Oku</a>
+
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>Henüz bölüm eklenmemiş.</p>
+    }
+
+</div>

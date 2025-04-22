@@ -36,10 +36,10 @@
             {
                 foreach (var image in Model.Images)
                 {
-                    <img src="~/webtoons/@Model.WebtoonName/@Model.ChapterName/@image"
+                    <img src="@Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{image}")"
                          class="img-fluid w-100 mb-3"
                          alt="Sayfa @Model.Images.IndexOf(image)"
-                         loading="lazy">
+                         loading="lazy" />
                 }
             }
             else
@@ -47,6 +47,7 @@
                 <div class="alert alert-danger mt-5">Bu bölümde hiç sayfa bulunamadı.</div>
             }
         </div>
+
 
         <!-- Alt Navigasyon -->
         <nav class="navbar navbar-dark bg-black fixed-bottom">
@@ -87,7 +88,7 @@
             @foreach (var image in Model.Images)
             {
                 <text>
-                        new Image().src = "@Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{image}")";
+                            new Image().src = "@Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{image}")";
                 </text>
             }
             });

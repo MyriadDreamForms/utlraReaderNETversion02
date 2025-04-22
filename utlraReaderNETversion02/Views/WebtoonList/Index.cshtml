@@ -4,13 +4,22 @@
 
 @model List<Webtoon>
 
-<h1>Webtoonlar</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Webtoonlar</h1>
 
-@foreach (var webtoon in Model)
-{
-    <div class="webtoon-item">
-        <a href="@Url.Action("Details", "Webtoon", new { name = webtoon.Name })">
-            @webtoon.DisplayName
-        </a>
+    <div class="row">
+        @foreach (var webtoon in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0">
+                    <img src="~/webtoons/@webtoon.Name/@webtoon.cover" class="card-img-top" alt="@webtoon.DisplayName">
+                    <div class="card-body">
+                        <h5 class="card-title">@webtoon.DisplayName</h5>
+                        <p class="card-text">@webtoon.Description</p>
+                        <a href="@Url.Action("Details", "Webtoon", new { name = webtoon.Name })" class="btn btn-dark w-100">Detaylar</a>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-}
+</div>

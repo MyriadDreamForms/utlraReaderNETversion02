@@ -65,9 +65,10 @@ namespace utlraReaderNETversion02.Controllers
         }
 
         // Bölüm Resimlerini Yükleme
-        public IActionResult Read(string webtoonName, string chapterName)
+        public IActionResult Index(string webtoon, string chapter)
+
         {
-            string chapterPath = Path.Combine(_env.WebRootPath, "webtoons", webtoonName, chapterName);
+            string chapterPath = Path.Combine(_env.WebRootPath, "webtoons", webtoon, chapter);
             if (!Directory.Exists(chapterPath))
                 return NotFound("Bölüm bulunamadı.");
 
@@ -76,8 +77,8 @@ namespace utlraReaderNETversion02.Controllers
                 .OrderBy(x => x, new NumericAndTextComparer())
                 .ToList();
 
-            ViewData["WebtoonName"] = webtoonName;
-            ViewData["ChapterName"] = chapterName;
+            ViewData["WebtoonName"] = webtoon;
+            ViewData["ChapterName"] = chapter;
             ViewData["Images"] = images;
 
             return View();
