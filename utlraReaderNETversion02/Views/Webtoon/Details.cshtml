@@ -46,7 +46,7 @@
                 <a href="@Url.Action("Edit", "Webtoon", new { name = webtoonName })" class="btn btn-warning">
                     ✏️ Düzenle
                 </a>
-                <a href="@Url.Action("AddChapter", "Webtoon", new { name = webtoonName })" class="btn btn-success">
+                <a asp-controller="Webtoon" asp-action="AddChapter" asp-route-name="@ViewData["WebtoonName"]" class="btn btn-primary">
                     ➕ Yeni Bölüm Ekle
                 </a>
             </div>

@@ -202,11 +202,20 @@ namespace utlraReaderNETversion02.Controllers
         }
 
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult AddChapter(string name)
         {
-            return View(new AddChapterViewModel { WebtoonName = name });
+            if (string.IsNullOrWhiteSpace(name))
+                return BadRequest("Webtoon adı eksik.");
+
+            var model = new AddChapterViewModel
+            {
+                WebtoonName = name
+            };
+
+            return View(model);
         }
+
 
         [Authorize(Roles = "Admin")]
         [HttpPost]

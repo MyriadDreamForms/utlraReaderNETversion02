@@ -18,10 +18,11 @@
         </div>
 
         <div class="mb-3">
-            <label asp-for="Images" class="form-label">Görseller (.jpg, .png)</label>
-            <input asp-for="Images" type="file" class="form-control" multiple />
+            <label asp-for="Images" class="form-label">Görseller (bir klasör seç)</label>
+            <input asp-for="Images" type="file" class="form-control" multiple webkitdirectory directory />
             <span asp-validation-for="Images" class="text-danger"></span>
         </div>
+
 
         <button type="submit" class="btn btn-success">Kaydet</button>
     </form>
