@@ -26,6 +26,23 @@
         </div>
     </div>
 
+    <div class="container mt-5">
+        <h2 class="mb-4">Moderatör Paneli</h2>
+        <div class="alert alert-info">
+            @ViewBag.WelcomeMessage
+        </div>
+
+        <div class="list-group">
+            <a href="@Url.Action("List", "Webtoon")" class="list-group-item list-group-item-action">
+                Tüm Webtoonları Görüntüle
+            </a>
+            <a href="#" class="list-group-item list-group-item-action disabled">
+                İçerik Onaylama (yakında)
+            </a>
+        </div>
+    </div>
+
+
     <h4>Son Eklenen Webtoonlar</h4>
     <ul class="list-group mb-4">
         @foreach (var name in recent)

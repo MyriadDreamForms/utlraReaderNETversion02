@@ -6,7 +6,7 @@ using utlraReaderNETversion02.Models.ViewModels;
 
 namespace utlraReaderNETversion02.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public class WebtoonController : Controller
     {
         private readonly IWebHostEnvironment _env;
@@ -17,6 +17,7 @@ namespace utlraReaderNETversion02.Controllers
         }
 
         // Detay Sayfası
+        [Authorize(Roles = "Admin,Moderator")]
         public IActionResult Details(string name)
         {
             // name parametresi boşsa hata döndür
@@ -68,6 +69,7 @@ namespace utlraReaderNETversion02.Controllers
         }
 
         // Bölüm Resimlerini Yükleme
+        [Authorize(Roles = "Admin,Moderator")]
         public IActionResult Index(string webtoon, string chapter)
 
         {
@@ -117,6 +119,7 @@ namespace utlraReaderNETversion02.Controllers
 
 
         // Düzenleme sayfası (GET)
+        [Authorize(Roles = "Admin,Moderator")]
         public IActionResult Edit(string name)
         {
             var webtoonInfo = LoadWebtoonInfo(name);
@@ -128,6 +131,7 @@ namespace utlraReaderNETversion02.Controllers
         }
 
         // Düzenleme sonrası kaydetme (POST)
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         public IActionResult Edit(string name, WebtoonInfo model)
         {
@@ -158,13 +162,15 @@ namespace utlraReaderNETversion02.Controllers
             return Path.Combine(_env.WebRootPath, "webtoons", name, "info.json");
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult Create(string name, string displayName, string description)
         {
@@ -202,6 +208,7 @@ namespace utlraReaderNETversion02.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpGet]
         public IActionResult AddChapter(string name)
         {
@@ -256,6 +263,7 @@ namespace utlraReaderNETversion02.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         public IActionResult Delete(string name)
         {
@@ -280,6 +288,7 @@ namespace utlraReaderNETversion02.Controllers
             return RedirectToAction("List");
         }
 
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         public IActionResult DeleteChapter(string webtoon, string chapter)
         {
@@ -304,7 +313,7 @@ namespace utlraReaderNETversion02.Controllers
             return RedirectToAction("Details", new { name = webtoon });
         }
 
-
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpGet]
         public IActionResult EditChapter(string webtoon, string chapter)
         {
@@ -342,6 +351,7 @@ namespace utlraReaderNETversion02.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         public async Task<IActionResult> EditChapter(Models.ViewModels.EditChapterViewModel model)
         {

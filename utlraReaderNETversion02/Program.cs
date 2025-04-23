@@ -6,12 +6,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Admin/Login";
-        options.AccessDeniedPath = "/Admin/Login";
-        options.LogoutPath = "/Admin/Logout";
+        // Giriş yapmamış kullanıcı buraya yönlendirilir
+        options.LoginPath = "/Account/Login"; // Ortak giriş sayfası istenirse değiştirilebilir
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Erişim yetkisi olmayanlar buraya yönlendirilir
+        options.LogoutPath = "/Account/Logout";
+        options.Cookie.Name = "UltraReaderAuth"; // İsteğe bağlı: çerez ismi
+        options.ExpireTimeSpan = TimeSpan.FromDays(7); // Oturum süresi
     });
 
-builder.Services.AddAuthorization(); // (isteğe bağlı, ama iyi olur)
+builder.Services.AddAuthorization(options =>
+{
+    // Gerekirse özel policy'ler eklenebilir
+    // options.AddPolicy("ModeratorOnly", policy => policy.RequireRole("Moderator"));
+});
 
 builder.Services.AddControllersWithViews();
 
@@ -29,10 +36,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// 🧠 Kimlik Doğrulama ve Yetkilendirme sırası ÖNEMLİ
+// 🧠 Kimlik Doğrulama ve Yetkilendirme sırası önemli
 app.UseAuthentication();
 app.UseAuthorization();
 
+// 🌐 Varsayılan route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=WebtoonList}/{action=Index}/{id?}");

@@ -1,0 +1,44 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Moderatör Paneli";
+    var recent = ViewBag.RecentWebtoons as List<string>;
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Moderatör Paneli</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Toplam Webtoon</h5>
+                    <p class="display-6">@ViewBag.TotalWebtoons</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-secondary">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary">Toplam Bölüm</h5>
+                    <p class="display-6">@ViewBag.TotalChapters</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Son Eklenen Webtoonlar</h4>
+    <ul class="list-group mb-4">
+        @foreach (var name in recent ?? new List<string>())
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                @name
+                <a class="btn btn-sm btn-outline-warning" href="@Url.Action("Details", "Webtoon", new { name = name })">Görüntüle</a>
+            </li>
+        }
+    </ul>
+
+    <div class="d-flex gap-3">
+        <a class="btn btn-outline-dark" href="@Url.Action("List", "Webtoon")">Tüm Webtoonlar</a>
+        <a class="btn btn-outline-danger" href="@Url.Action("Logout", "Moderator")">Çıkış Yap</a>
+    </div>
+</div>

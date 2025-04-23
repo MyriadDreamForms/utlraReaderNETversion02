@@ -1,0 +1,35 @@
+﻿@model WebtoonInfo
+@{
+    // Webtoon adı ViewData üzerinden alınıyor
+    var webtoonName = ViewData["WebtoonName"] as string;
+    ViewData["Title"] = Model.Title;
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <!-- Webtoon Bilgileri -->
+    <div class="row mb-5">
+        <!-- Kapak Görseli -->
+        <div class="col-md-4 text-center">
+            @if (!string.IsNullOrEmpty(Model.Cover))
+            {
+                <img src="@Url.Content($"~/webtoons/{webtoonName}/{Model.Cover}")" alt="@Model.Title" class="img-fluid rounded shadow" style="max-height: 400px;" />
+            }
+            else
+            {
+                <img src="@Url.Content("~/images/default-cover.jpg")" alt="Varsayılan Kapak" class="img-fluid rounded shadow" style="max-height: 400px;" />
+            }
+        </div>
+        <!-- Bilgi ve Açıklama -->
+        <div class="col-md-8">
+            <h2 class="mb-3">@Model.Title</h2>
+            <p class="lead text-muted">@Model.Description</p>
+            <div class="alert alert-warning">
+                <strong>Not:</strong> Bölümleri okumak için giriş yapmanız gerekiyor.
+                <a href="/Account/Login" class="alert-link">Giriş Yapın</a>.
+            </div>
+        </div>
+    </div>
+
+    <!-- (Opsiyonel) Ek içerik, örneğin benzer webtoonlar veya yorumlar eklenebilir -->
+</div>

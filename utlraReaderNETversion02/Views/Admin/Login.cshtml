@@ -2,26 +2,35 @@
 @model LoginViewModel
 
 @{
-    ViewData["Title"] = "Admin Girişi";
+    ViewData["Title"] = "Giriş Yap";
     Layout = "_Layout";
 }
 
 <div class="container mt-5" style="max-width: 400px;">
-    <h2 class="mb-4">Admin Girişi</h2>
+    <h2 class="mb-4 text-center">Giriş Paneli</h2>
 
     <form asp-action="Login" method="post">
         <div class="mb-3">
             <label asp-for="Username" class="form-label">Kullanıcı Adı</label>
-            <input asp-for="Username" class="form-control" />
+            <input asp-for="Username" class="form-control" placeholder="admin veya moderator" />
             <span asp-validation-for="Username" class="text-danger" />
         </div>
 
         <div class="mb-3">
             <label asp-for="Password" class="form-label">Şifre</label>
-            <input asp-for="Password" type="password" class="form-control" />
+            <input asp-for="Password" type="password" class="form-control" placeholder="Şifrenizi girin" />
             <span asp-validation-for="Password" class="text-danger" />
+        </div>
+
+        <div class="mb-3 text-muted small">
+            <p class="mb-1">🧑‍💼 <strong>Admin</strong>: <code>admin / 1234</code></p>
+            <p class="mb-0">🛡️ <strong>Moderatör</strong>: <code>moderator / mod123</code></p>
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
     </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
