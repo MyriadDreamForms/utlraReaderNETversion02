@@ -29,17 +29,37 @@
             <nav class="d-flex align-items-center">
                 <a href="/" class="text-light me-3">Anasayfa</a>
                 <a href="/Webtoon/List" class="text-light me-3">Webtoonlar</a>
+
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <a href="/Admin/Dashboard" class="text-light me-3">Dashboard</a>
-                    <a href="/Admin/Logout" class="text-light me-3">Çıkış Yap</a>
+                    <span class="text-light me-3">👤 @User.Identity.Name</span>
+
+                    @* Eğer kullanıcı admin/moderatörse dashboard linki *@
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a href="/Admin/Dashboard" class="text-light me-3">Admin Panel</a>
+                    }
+                    else if (User.IsInRole("Moderator"))
+                    {
+                        <a href="/Moderator/Dashboard" class="text-light me-3">Moderatör Panel</a>
+                    }
+
+                    <form class="d-inline" method="post" asp-area="Identity" asp-page="/Account/Logout">
+                        <button type="submit" class="btn btn-sm btn-outline-light">Çıkış Yap</button>
+                    </form>
                 }
                 else
                 {
+                    <a href="/Identity/Account/Login" class="text-light me-3">Giriş Yap</a>
+                    <a href="/Identity/Account/Register" class="text-light me-3">Kayıt Ol</a>
+
+                    @* Admin paneline özel ayrı giriş linki (istersen kaldırabiliriz) *@
                     <a href="/Admin/Login" class="text-light me-3">Admin Giriş</a>
                 }
+
                 <span class="theme-toggle text-light" onclick="toggleTheme()" title="Tema Değiştir">🌓</span>
             </nav>
+
         </div>
     </header>
 
@@ -67,7 +87,7 @@
         }
 
         function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');    
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);

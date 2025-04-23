@@ -1,31 +1,49 @@
-ï»¿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using utlraReaderNETversion02.Data;
+using utlraReaderNETversion02.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ğŸ›  Authentication ve Authorization servisleri
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        // GiriÅŸ yapmamÄ±ÅŸ kullanÄ±cÄ± buraya yÃ¶nlendirilir
-        options.LoginPath = "/Account/Login"; // Ortak giriÅŸ sayfasÄ± istenirse deÄŸiÅŸtirilebilir
-        options.AccessDeniedPath = "/Account/AccessDenied"; // EriÅŸim yetkisi olmayanlar buraya yÃ¶nlendirilir
-        options.LogoutPath = "/Account/Logout";
-        options.Cookie.Name = "UltraReaderAuth"; // Ä°steÄŸe baÄŸlÄ±: Ã§erez ismi
-        options.ExpireTimeSpan = TimeSpan.FromDays(7); // Oturum sÃ¼resi
-    });
+// Bağlantı dizesini "PostgreSQL" anahtarıyla alıyoruz.
+var connectionString = builder.Configuration.GetConnectionString("PostgreSQL");
+Console.WriteLine($"Alınan Connection String: {connectionString}");
 
-builder.Services.AddAuthorization(options =>
+// Veritabanı bağlantısını test et
+try
 {
-    // Gerekirse Ã¶zel policy'ler eklenebilir
-    // options.AddPolicy("ModeratorOnly", policy => policy.RequireRole("Moderator"));
-});
+    using var connection = new Npgsql.NpgsqlConnection(connectionString);
+    await connection.OpenAsync();
+    Console.WriteLine("PostgreSQL bağlantısı başarılı!");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Bağlantı hatası: {ex.Message}");
+    throw;
+}
+
+
+// PostgreSQL için Npgsql kullanıyoruz
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// Identity ayarları
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// ğŸ“¦ Middleware sÄ±ralamasÄ±
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -36,13 +54,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// ğŸ§  Kimlik DoÄŸrulama ve Yetkilendirme sÄ±rasÄ± Ã¶nemli
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ğŸŒ VarsayÄ±lan route
+// Varsayılan route ayarı
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=WebtoonList}/{action=Index}/{id?}");
+
+// Identity Razor Pages (Identity sayfalarını etkinleştirir)
+app.MapRazorPages();
 
 app.Run();
