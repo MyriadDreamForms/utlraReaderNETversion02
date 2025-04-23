@@ -313,13 +313,16 @@ namespace utlraReaderNETversion02.Controllers
 
             string chapterPath = Path.Combine(_env.WebRootPath, "webtoons", webtoon, chapter);
 
+            // Dizin var mı kontrol edelim
+            if (!Directory.Exists(chapterPath))
+                return NotFound($"Bölüm klasörü bulunamadı: {chapterPath}");
 
             var files = Directory.GetFiles(chapterPath)
-                                 .Where(f => f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
-                                          || f.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-                                 .Select(Path.GetFileName)
-                                 .OrderBy(x => x, new NumericAndTextComparer())
-                                 .ToList();
+                     .Where(f => f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+                              || f.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                     .Select(Path.GetFileName)
+                     .OrderBy(x => x, new NumericAndTextComparer())
+                     .ToList();
 
             var existingImages = files.Select(f => new ChapterImageViewModel
             {
@@ -327,6 +330,7 @@ namespace utlraReaderNETversion02.Controllers
                 NewName = f,
                 Delete = false
             }).ToList();
+
 
             var model = new Models.ViewModels.EditChapterViewModel
             {
@@ -337,6 +341,7 @@ namespace utlraReaderNETversion02.Controllers
 
             return View(model);
         }
+
         [HttpPost]
         public async Task<IActionResult> EditChapter(Models.ViewModels.EditChapterViewModel model)
         {
@@ -362,11 +367,14 @@ namespace utlraReaderNETversion02.Controllers
                 model.ChapterName = model.NewChapterName;
             }
 
-            // Mevcut görseller üzerinde düzenleme yap: silme veya yeniden adlandırma
             foreach (var image in model.ExistingImages)
             {
+                // Eğer image.FileName null veya boş ise, bu öğeyi atla
+                if (string.IsNullOrEmpty(image.FileName))
+                    continue;
+
                 string filePath = Path.Combine(currentChapterPath, image.FileName);
-                // Eğer silinmesi isteniyorsa
+                // Eğer silinmek isteniyorsa
                 if (image.Delete)
                 {
                     if (System.IO.File.Exists(filePath))
@@ -380,6 +388,7 @@ namespace utlraReaderNETversion02.Controllers
                         System.IO.File.Move(filePath, newFilePath);
                 }
             }
+
 
             // Yeni görselleri yükle
             if (model.NewImages != null && model.NewImages.Count > 0)

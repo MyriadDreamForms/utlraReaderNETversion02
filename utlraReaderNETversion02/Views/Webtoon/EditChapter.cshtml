@@ -8,13 +8,19 @@
 <div class="container mt-5">
     <h2>@Model.WebtoonName - '@Model.ChapterName' Bölümünü Düzenle</h2>
 
+    @* Validasyon özetini göster *@
+    <div asp-validation-summary="All" class="text-danger"></div>
+
     <form asp-action="EditChapter" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="WebtoonName" />
         <input type="hidden" asp-for="ChapterName" />
 
         <div class="mb-3">
-            <label class="form-label">Bölüm Adı (Güncellemek istiyorsanız)</label>
-            <input type="text" class="form-control" name="NewChapterName" placeholder="Yeni bölüm adı (opsiyonel)" />
+            <label asp-for="NewChapterName" class="form-label">
+                Bölüm Adı (Güncellemek isterseniz)
+            </label>
+            <input asp-for="NewChapterName" class="form-control" placeholder="Yeni bölüm adı (opsiyonel)" />
+            <span asp-validation-for="NewChapterName" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -34,15 +40,18 @@
                         <tr>
                             <td>
                                 <img src="@Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{Model.ExistingImages[i].FileName}")" width="80" class="img-thumbnail" />
+                                <!-- Gizli inputlar: Bu değerler form gönderildiğinde korunur -->
+                                <input type="hidden" asp-for="ExistingImages[@i].FileName" />
                             </td>
                             <td>
                                 @Html.DisplayFor(m => m.ExistingImages[i].FileName)
                             </td>
                             <td>
-                                <input type="text" class="form-control" asp-for="ExistingImages[@i].NewName" value="@Model.ExistingImages[i].NewName" />
+                                <input asp-for="ExistingImages[@i].NewName" class="form-control" />
+                                <span asp-validation-for="ExistingImages[@i].NewName" class="text-danger"></span>
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" class="form-check-input" asp-for="ExistingImages[@i].Delete" />
+                                <input type="checkbox" asp-for="ExistingImages[@i].Delete" class="form-check-input" />
                             </td>
                         </tr>
                     }
@@ -51,7 +60,7 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Yeni Görseller Ekle</label>
+            <label asp-for="NewImages" class="form-label">Yeni Görseller Ekle</label>
             <input asp-for="NewImages" type="file" multiple class="form-control" />
             <span asp-validation-for="NewImages" class="text-danger"></span>
         </div>
