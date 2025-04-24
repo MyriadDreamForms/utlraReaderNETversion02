@@ -4,17 +4,11 @@
     <meta charset="utf-8" />
     <title>@ViewData["Title"] - ultraReader</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- Open Graph Meta -->
     <meta property="og:title" content="@ViewData["og:title"]" />
     <meta property="og:description" content="@ViewData["og:description"]" />
     <meta property="og:image" content="@ViewData["og:image"]" />
-
     <style>
-        /* Tema toggle simgesi stili */
         .theme-toggle {
             cursor: pointer;
             font-size: 1.2rem;
@@ -22,19 +16,15 @@
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <!-- Navbar -->
     <header class="bg-dark text-light p-3 mb-4 shadow-sm">
         <div class="container d-flex justify-content-between align-items-center">
             <a href="/" class="text-light text-decoration-none h5 mb-0">📚 ultraReader</a>
             <nav class="d-flex align-items-center">
                 <a href="/" class="text-light me-3">Anasayfa</a>
                 <a href="/Webtoon/List" class="text-light me-3">Webtoonlar</a>
-
                 @if (User.Identity.IsAuthenticated)
                 {
                     <span class="text-light me-3">👤 @User.Identity.Name</span>
-
-                    @* Eğer kullanıcı admin/moderatörse dashboard linki *@
                     @if (User.IsInRole("Admin"))
                     {
                         <a href="/Admin/Dashboard" class="text-light me-3">Admin Panel</a>
@@ -43,7 +33,6 @@
                     {
                         <a href="/Moderator/Dashboard" class="text-light me-3">Moderatör Panel</a>
                     }
-
                     <form class="d-inline" method="post" asp-area="Identity" asp-page="/Account/Logout">
                         <button type="submit" class="btn btn-sm btn-outline-light">Çıkış Yap</button>
                     </form>
@@ -52,32 +41,23 @@
                 {
                     <a href="/Identity/Account/Login" class="text-light me-3">Giriş Yap</a>
                     <a href="/Identity/Account/Register" class="text-light me-3">Kayıt Ol</a>
-
-                    @* Admin paneline özel ayrı giriş linki (istersen kaldırabiliriz) *@
                     <a href="/Admin/Login" class="text-light me-3">Admin Giriş</a>
                 }
-
                 <span class="theme-toggle text-light" onclick="toggleTheme()" title="Tema Değiştir">🌓</span>
             </nav>
-
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="container flex-grow-1 mb-5">
         @RenderBody()
     </main>
 
-    <!-- Footer -->
     <footer class="bg-dark text-light text-center py-3 border-top mt-auto shadow-sm">
         <small>&copy; @DateTime.Now.Year ultraReader • Offline Webtoon Okuyucu</small>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-        // Sistem temasını kontrol et (kullanıcının tercihine göre)
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const storedTheme = localStorage.getItem('theme');
         if (storedTheme) {
@@ -85,15 +65,13 @@
         } else {
             document.documentElement.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
         }
-
         function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme');    
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);
         }
     </script>
-
     @RenderSection("Scripts", required: false)
 </body>
 </html>

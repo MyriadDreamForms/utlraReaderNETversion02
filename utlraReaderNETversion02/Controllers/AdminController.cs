@@ -1,16 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using utlraReaderNETversion02.Models;
 using utlraReaderNETversion02.Models.ViewModels;
 
 namespace utlraReaderNETversion02.Controllers
 {
-    [Authorize(Roles = "Admin,Moderator")] // Artık her iki rol de girebilir
+    [Authorize(Roles = "Admin,Moderator")]
     public class AdminController : Controller
     {
+        // Giriş işlemi için sabit kullanıcı adları; bu örnek geliştirme aşamasında
+        private const string AdminUsername = "admin";
+        private const string ModeratorUsername = "moderator";
+
+        // Giriş parolaları
+        private const string AdminPassword = "1234";
+        private const string ModeratorPassword = "mod123";
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Login()
@@ -25,11 +33,10 @@ namespace utlraReaderNETversion02.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // Rol belirleme
             string role = "";
-            if (model.Username == "admin" && model.Password == "1234")
+            if (model.Username == AdminUsername && model.Password == AdminPassword)
                 role = "Admin";
-            else if (model.Username == "moderator" && model.Password == "mod123")
+            else if (model.Username == ModeratorUsername && model.Password == ModeratorPassword)
                 role = "Moderator";
             else
             {
@@ -43,12 +50,13 @@ namespace utlraReaderNETversion02.Controllers
                 new Claim(ClaimTypes.Role, role)
             };
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            // Identity'nin default cookie şeması "Identity.Application" kullanılıyor.
+            var identity = new ClaimsIdentity(claims, "Identity.Application");
             var principal = new ClaimsPrincipal(identity);
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            // Oturum açtırma: burada şema olarak "Identity.Application" kullanılır.
+            await HttpContext.SignInAsync("Identity.Application", principal);
 
-            // Rolüne göre yönlendirme
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
 
@@ -58,11 +66,12 @@ namespace utlraReaderNETversion02.Controllers
             return RedirectToAction("Dashboard", "Moderator");
         }
 
-        [Authorize(Roles = "Admin")] // Dashboard sadece admin'e özel
+        [Authorize(Roles = "Admin")]
         public IActionResult Dashboard()
         {
+            // Sadece admin için; moderatör için ModeratörController kullanılabilir.
             string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "webtoons");
-            var directories = Directory.Exists(rootPath) ? Directory.GetDirectories(rootPath) : new string[0];
+            var directories = Directory.Exists(rootPath) ? Directory.GetDirectories(rootPath) : Array.Empty<string>();
 
             var webtoonList = new List<string>();
             int totalChapters = 0;
@@ -71,9 +80,7 @@ namespace utlraReaderNETversion02.Controllers
             {
                 string name = Path.GetFileName(dir);
                 webtoonList.Add(name);
-
-                var chapterDirs = Directory.GetDirectories(dir);
-                totalChapters += chapterDirs.Length;
+                totalChapters += Directory.GetDirectories(dir).Length;
             }
 
             ViewBag.TotalWebtoons = webtoonList.Count;
@@ -86,7 +93,8 @@ namespace utlraReaderNETversion02.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            // Identity'nin logout işlemi için Razor Pages kullanılan Identity Logout sayfası: 
+            await HttpContext.SignOutAsync("Identity.Application");
             return RedirectToAction("Login");
         }
     }

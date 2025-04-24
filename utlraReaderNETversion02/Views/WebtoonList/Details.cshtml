@@ -1,35 +1,51 @@
 ﻿@model WebtoonInfo
 @{
-    // Webtoon adı ViewData üzerinden alınıyor
     var webtoonName = ViewData["WebtoonName"] as string;
     ViewData["Title"] = Model.Title;
     Layout = "_Layout";
 }
 
-<div class="container mt-4">
-    <!-- Webtoon Bilgileri -->
-    <div class="row mb-5">
+<div class="container py-5">
+    <div class="row g-5">
         <!-- Kapak Görseli -->
         <div class="col-md-4 text-center">
-            @if (!string.IsNullOrEmpty(Model.Cover))
-            {
-                <img src="@Url.Content($"~/webtoons/{webtoonName}/{Model.Cover}")" alt="@Model.Title" class="img-fluid rounded shadow" style="max-height: 400px;" />
-            }
-            else
-            {
-                <img src="@Url.Content("~/images/default-cover.jpg")" alt="Varsayılan Kapak" class="img-fluid rounded shadow" style="max-height: 400px;" />
-            }
+            <img src="@Url.Content($"~/webtoons/{webtoonName}/{Model.Cover ?? "default-cover.jpg"}")"
+                 class="img-fluid rounded shadow" alt="@Model.Title" />
         </div>
-        <!-- Bilgi ve Açıklama -->
+
+        <!-- Bilgiler -->
         <div class="col-md-8">
-            <h2 class="mb-3">@Model.Title</h2>
-            <p class="lead text-muted">@Model.Description</p>
+            <h2 class="mb-3 fw-bold">@Model.Title</h2>
+            <div class="mb-2"><strong>Yazar:</strong> @Model.Author</div>
+            <div class="mb-2"><strong>Tür:</strong> @Model.Genre</div>
+            <div class="mb-2"><strong>Durum:</strong> @Model.Status</div>
+            <div class="mb-4">
+                <strong>Açıklama:</strong>
+                <p class="mt-1 text-muted">@Model.Description</p>
+            </div>
+
             <div class="alert alert-warning">
-                <strong>Not:</strong> Bölümleri okumak için giriş yapmanız gerekiyor.
-                <a href="/Account/Login" class="alert-link">Giriş Yapın</a>.
+                <strong>Not:</strong> Bölümleri görmek için lütfen
+                <a href="/Identity/Account/Login" class="alert-link">giriş yapın</a>.
             </div>
         </div>
     </div>
 
-    <!-- (Opsiyonel) Ek içerik, örneğin benzer webtoonlar veya yorumlar eklenebilir -->
+    <!-- Bölüm Listesi -->
+    @if (Model.Chapters != null && Model.Chapters.Any())
+    {
+        <hr />
+        <h4 class="mt-5 mb-3">Bölümler</h4>
+        <ul class="list-group">
+            @foreach (var chapter in Model.Chapters.OrderByDescending(c => c.Number))
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a asp-controller="Webtoon" asp-action="ReadChapter" asp-route-name="@webtoonName" asp-route-chapter="@chapter.Number">
+                        Bölüm @chapter.Number - @chapter.Title
+                    </a>
+                    <span class="text-muted small">@chapter.ReleaseDate.ToShortDateString()</span>
+                </li>
+            }
+        </ul>
+    }
 </div>
