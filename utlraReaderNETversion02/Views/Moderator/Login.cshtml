@@ -8,20 +8,17 @@
 
 <div class="container mt-5" style="max-width: 400px;">
     <h2 class="mb-4 text-center">Moderatör Girişi</h2>
-
     <form asp-action="Login" method="post">
         <div class="mb-3">
             <label asp-for="Username" class="form-label">Kullanıcı Adı</label>
-            <input asp-for="Username" class="form-control" />
+            <input asp-for="Username" class="form-control" placeholder="mod" />
             <span asp-validation-for="Username" class="text-danger"></span>
         </div>
-
         <div class="mb-3">
             <label asp-for="Password" class="form-label">Şifre</label>
-            <input asp-for="Password" type="password" class="form-control" />
+            <input asp-for="Password" type="password" class="form-control" placeholder="1234" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-
         <button type="submit" class="btn btn-warning w-100">Giriş Yap</button>
     </form>
 </div>

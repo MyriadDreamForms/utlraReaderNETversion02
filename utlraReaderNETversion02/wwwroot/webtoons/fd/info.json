@@ -1,6 +1,20 @@
 {
-  "Title": "fdfd",
-  "Author": null,
-  "Description": "",
-  "Cover": null
+  "title": "Webtoon Başlığı",
+  "author": "Yazar Adı",
+  "genre": "Macera",
+  "status": "Devam Ediyor",
+  "description": "Açıklama metni.",
+  "cover": "cover.jpg",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Bölüm 1",
+      "releaseDate": "2024-05-01"
+    },
+    {
+      "number": 2,
+      "title": "Bölüm 2",
+      "releaseDate": "2024-05-10"
+    }
+  ]
 }

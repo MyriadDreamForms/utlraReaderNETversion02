@@ -13,12 +13,12 @@ namespace utlraReaderNETversion02.Controllers
 
         public ReaderController(IWebHostEnvironment env)
         {
-            _env = env; // IWebHostEnvironment enjekte edildi
+            _env = env;
         }
 
         public IActionResult Index(string webtoon, string chapter)
         {
-            // Webtoon ve chapter parametrelerini kontrol et
+            // Parametre kontrolü
             if (string.IsNullOrEmpty(webtoon) || string.IsNullOrEmpty(chapter))
                 return BadRequest("Geçersiz parametre.");
 
@@ -27,7 +27,7 @@ namespace utlraReaderNETversion02.Controllers
             if (images == null || images.Count == 0)
                 return NotFound("Bölüm bulunamadı.");
 
-            // Bölüm listesini otomatik algıla (JSON'dan DEĞİL)
+            // Webtoon klasöründeki tüm bölüm klasörlerini oku (JSON değil klasör yapısı kullanılıyor)
             var chapterList = LoadChapterList(webtoon);
             if (chapterList.Count == 0)
                 return NotFound("Bölüm listesi boş.");
@@ -37,7 +37,7 @@ namespace utlraReaderNETversion02.Controllers
             if (currentIndex == -1)
                 return NotFound("Bölüm geçersiz.");
 
-            // ViewModel'i oluştur
+            // ReaderViewModel oluşturuluyor
             var viewModel = new ReaderViewModel
             {
                 Images = images,
@@ -50,14 +50,15 @@ namespace utlraReaderNETversion02.Controllers
             return View(viewModel);
         }
 
+
         private List<string> LoadChapterImages(string webtoon, string chapter)
         {
-            // Doğru yol için _env.WebRootPath kullan
+            // Klasör yolunu belirle
             string chapterPath = Path.Combine(_env.WebRootPath, "webtoons", webtoon, chapter);
             if (!Directory.Exists(chapterPath))
                 return new List<string>();
 
-            // NumericAndTextComparer ile sırala
+            // .jpg dosyalarını al ve NumericAndTextComparer ile sırala
             return Directory.GetFiles(chapterPath, "*.jpg")
                 .Select(Path.GetFileName)
                 .OrderBy(x => x, new NumericAndTextComparer())
@@ -66,20 +67,21 @@ namespace utlraReaderNETversion02.Controllers
 
         private List<string> LoadChapterList(string webtoon)
         {
-            // Bölümleri JSON'dan DEĞIL, klasör yapısından oku
+            // Webtoon klasörü altında bulunan bölüm klasörlerini oku
             string chaptersPath = Path.Combine(_env.WebRootPath, "webtoons", webtoon);
             if (!Directory.Exists(chaptersPath))
                 return new List<string>();
 
             return Directory.GetDirectories(chaptersPath)
                 .Select(Path.GetFileName)
-                .Where(folder => !string.IsNullOrEmpty(folder) && !folder.Equals("info.json", StringComparison.OrdinalIgnoreCase))
+                .Where(folder => !string.IsNullOrWhiteSpace(folder) &&
+                                 !folder.Equals("info.json", System.StringComparison.OrdinalIgnoreCase))
                 .OrderBy(x => x, new NumericAndTextComparer())
                 .ToList();
         }
     }
 
-    // NumericAndTextComparer sınıfı (WebtoonController'dan taşındı)
+    // Karşılaştırıcı: Sayısal ve metinsel sıralama için
     public class NumericAndTextComparer : IComparer<string>
     {
         public int Compare(string x, string y)
@@ -87,10 +89,12 @@ namespace utlraReaderNETversion02.Controllers
             if (int.TryParse(x, out int numX) && int.TryParse(y, out int numY))
                 return numX.CompareTo(numY);
 
-            if (int.TryParse(x, out _)) return -1;
-            if (int.TryParse(y, out _)) return 1;
+            if (int.TryParse(x, out _))
+                return -1;
+            if (int.TryParse(y, out _))
+                return 1;
 
-            return string.Compare(x, y, StringComparison.Ordinal);
+            return string.Compare(x, y, System.StringComparison.Ordinal);
         }
     }
 }

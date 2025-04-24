@@ -1,5 +1,10 @@
-﻿@model WebtoonInfo
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject SignInManager<ApplicationUser> SignInManager
+
+@model WebtoonInfo
 @{
+    // Webtoon adı, ilgili controller'dan ViewData aracılığıyla gönderiliyor.
     var webtoonName = ViewData["WebtoonName"] as string;
     ViewData["Title"] = Model.Title;
     Layout = "_Layout";
@@ -7,13 +12,14 @@
 
 <div class="container py-5">
     <div class="row g-5">
-        <!-- Kapak Görseli -->
+        <!-- Kapak Görseli Bölümü -->
         <div class="col-md-4 text-center">
             <img src="@Url.Content($"~/webtoons/{webtoonName}/{Model.Cover ?? "default-cover.jpg"}")"
-                 class="img-fluid rounded shadow" alt="@Model.Title" />
+                 class="img-fluid rounded shadow"
+                 alt="@Model.Title" style="max-height: 400px;" />
         </div>
 
-        <!-- Bilgiler -->
+        <!-- Webtoon Bilgi Bölümü -->
         <div class="col-md-8">
             <h2 class="mb-3 fw-bold">@Model.Title</h2>
             <div class="mb-2"><strong>Yazar:</strong> @Model.Author</div>
@@ -24,10 +30,14 @@
                 <p class="mt-1 text-muted">@Model.Description</p>
             </div>
 
-            <div class="alert alert-warning">
-                <strong>Not:</strong> Bölümleri görmek için lütfen
-                <a href="/Identity/Account/Login" class="alert-link">giriş yapın</a>.
-            </div>
+            @* Kullanıcı giriş yapmadıysa uyarı ver, aksi halde bölüm listesine yönlendiren buton veya kontrol ekleyebilirsin *@
+            @if (!SignInManager.IsSignedIn(User))
+            {
+                <div class="alert alert-warning">
+                    <strong>Not:</strong> Bölümleri görüntülemek için lütfen
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details", "Webtoon", new { name = webtoonName })" class="alert-link">giriş yapın</a>.
+                </div>
+            }
         </div>
     </div>
 
@@ -40,7 +50,7 @@
             @foreach (var chapter in Model.Chapters.OrderByDescending(c => c.Number))
             {
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <a asp-controller="Webtoon" asp-action="ReadChapter" asp-route-name="@webtoonName" asp-route-chapter="@chapter.Number">
+                    <a asp-controller="Webtoon" asp-action="ReadChapter" asp-route-name="@webtoonName" asp-route-chapter="@chapter.Number" class="text-decoration-none">
                         Bölüm @chapter.Number - @chapter.Title
                     </a>
                     <span class="text-muted small">@chapter.ReleaseDate.ToShortDateString()</span>

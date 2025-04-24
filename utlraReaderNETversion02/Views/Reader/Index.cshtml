@@ -1,15 +1,8 @@
-﻿@model ReaderViewModel
+﻿@model utlraReaderNETversion02.ViewModels.ReaderViewModel
+
 @{
     ViewData["Title"] = Model != null ? $"{Model.WebtoonName} - {Model.ChapterName}" : "Webtoon Okuyucu";
-
-    if (Model != null)
-    {
-        ViewData["og:title"] = Model.WebtoonName;
-        ViewData["og:description"] = $"Şu anda okuyorsunuz: {Model.ChapterName}";
-        ViewData["og:image"] = Model.Images?.Count > 0
-            ? Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{Model.Images.First()}")
-            : "";
-    }
+    Layout = "_Layout";
 }
 
 <div class="container-fluid bg-dark min-vh-100">
@@ -22,8 +15,9 @@
         <!-- Üst Bilgi -->
         <nav class="navbar navbar-dark bg-black fixed-top">
             <div class="container">
-                <a href="@Url.Action("Details", "Webtoon", new { name = Model.WebtoonName })"
-                   class="navbar-brand">@Model.WebtoonName</a>
+                <a asp-controller="WebtoonList" asp-action="Details" asp-route-name="@Model.WebtoonName" class="navbar-brand">
+                    @Model.WebtoonName
+                </a>
                 <span class="navbar-text text-light">
                     Bölüm: @Model.ChapterName
                 </span>
@@ -38,7 +32,7 @@
                 {
                     <img src="@Url.Content($"~/webtoons/{Model.WebtoonName}/{Model.ChapterName}/{image}")"
                          class="img-fluid w-100 mb-3"
-                         alt="Sayfa @Model.Images.IndexOf(image)"
+                         alt="Sayfa @(Model.Images.IndexOf(image) + 1)"
                          loading="lazy" />
                 }
             }
@@ -48,14 +42,12 @@
             }
         </div>
 
-
         <!-- Alt Navigasyon -->
         <nav class="navbar navbar-dark bg-black fixed-bottom">
             <div class="container justify-content-between">
                 @if (!string.IsNullOrEmpty(Model.PreviousChapter))
                 {
-                    <a href="@Url.Action("Index", "Reader", new { webtoon = Model.WebtoonName, chapter = Model.PreviousChapter })"
-                       class="btn btn-outline-light">
+                    <a asp-controller="Reader" asp-action="Index" asp-route-webtoon="@Model.WebtoonName" asp-route-chapter="@Model.PreviousChapter" class="btn btn-outline-light">
                         ← Önceki Bölüm
                     </a>
                 }
@@ -66,8 +58,7 @@
 
                 @if (!string.IsNullOrEmpty(Model.NextChapter))
                 {
-                    <a href="@Url.Action("Index", "Reader", new { webtoon = Model.WebtoonName, chapter = Model.NextChapter })"
-                       class="btn btn-outline-light">
+                    <a asp-controller="Reader" asp-action="Index" asp-route-webtoon="@Model.WebtoonName" asp-route-chapter="@Model.NextChapter" class="btn btn-outline-light">
                         Sonraki Bölüm →
                     </a>
                 }

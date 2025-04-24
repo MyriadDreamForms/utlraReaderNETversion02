@@ -1,38 +1,45 @@
-using Microsoft.AspNetCore.Identity;
+ï»¿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using utlraReaderNETversion02.Data;
 using utlraReaderNETversion02.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Bağlantı dizesini "PostgreSQL" anahtarıyla alıyoruz.
+// BaÄŸlantÄ± dizesini "PostgreSQL" anahtarÄ±yla alÄ±yoruz.
 var connectionString = builder.Configuration.GetConnectionString("PostgreSQL");
-Console.WriteLine($"Alınan Connection String: {connectionString}");
+Console.WriteLine($"AlÄ±nan Connection String: {connectionString}");
 
-// Veritabanı bağlantısını test et
+// VeritabanÄ± baÄŸlantÄ±sÄ±nÄ± test et
 try
 {
     using var connection = new Npgsql.NpgsqlConnection(connectionString);
     await connection.OpenAsync();
-    Console.WriteLine("PostgreSQL bağlantısı başarılı!");
+    Console.WriteLine("PostgreSQL baÄŸlantÄ±sÄ± baÅŸarÄ±lÄ±!");
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Bağlantı hatası: {ex.Message}");
+    Console.WriteLine($"BaÄŸlantÄ± hatasÄ±: {ex.Message}");
     throw;
 }
 
-
-// PostgreSQL için Npgsql kullanıyoruz
+// PostgreSQL iÃ§in Npgsql kullanÄ±yoruz
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Identity ayarları
+// Identity ayarlarÄ±
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
 .AddEntityFrameworkStores<AppDbContext>();
+
+// â›” Cookie ayarlarÄ±: AccessDenied iÃ§in yÃ¶nlendirme ekleniyor!
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";               // GiriÅŸ yapÄ±lmadÄ±ysa buraya yÃ¶nlendir
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // GiriÅŸ var ama yetki yoksa buraya yÃ¶nlendir
+    options.SlidingExpiration = true;
+});
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -54,15 +61,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication(); // kimlik doÄŸrulama
+app.UseAuthorization();  // yetkilendirme
 
-// Varsayılan route ayarı
+// VarsayÄ±lan route ayarÄ±
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=WebtoonList}/{action=Index}/{id?}");
 
-// Identity Razor Pages (Identity sayfalarını etkinleştirir)
+// Identity Razor Pages (Identity sayfalarÄ±nÄ± etkinleÅŸtirir)
 app.MapRazorPages();
 
 app.Run();

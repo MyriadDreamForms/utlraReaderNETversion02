@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Moderatör Paneli";
-    var recent = ViewBag.RecentWebtoons as List<string>;
+    var recent = ViewBag.RecentWebtoons as List<string> ?? new List<string>();
 }
 
 <div class="container mt-5">
@@ -28,7 +28,7 @@
 
     <h4>Son Eklenen Webtoonlar</h4>
     <ul class="list-group mb-4">
-        @foreach (var name in recent ?? new List<string>())
+        @foreach (var name in recent)
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 @name

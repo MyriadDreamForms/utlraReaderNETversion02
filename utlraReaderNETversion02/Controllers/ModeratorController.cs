@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using utlraReaderNETversion02.Models.ViewModels;
 
@@ -17,7 +17,7 @@ namespace utlraReaderNETversion02.Controllers
         [AllowAnonymous]
         public IActionResult Login()
         {
-            return View();
+            return View(); // Views/Moderator/Login.cshtml
         }
 
         [HttpPost]
@@ -35,10 +35,10 @@ namespace utlraReaderNETversion02.Controllers
                     new Claim(ClaimTypes.Role, "Moderator")
                 };
 
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var identity = new ClaimsIdentity(claims, "Identity.Application");
                 var principal = new ClaimsPrincipal(identity);
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                await HttpContext.SignInAsync("Identity.Application", principal);
 
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return Redirect(returnUrl);
@@ -46,18 +46,20 @@ namespace utlraReaderNETversion02.Controllers
                 return RedirectToAction("Dashboard", "Moderator");
             }
 
-            ModelState.AddModelError("", "Kullanıcı adı veya şifre yanlış.");
+            ModelState.AddModelError(string.Empty, "Kullanıcı adı veya şifre yanlış.");
             return View(model);
         }
 
         public IActionResult Dashboard()
         {
-            return View(); // buraya özel yetkiler/istatistikler konulabilir
+            // Moderatör paneli; burada istatistikler veya onay işlemleri eklenebilir.
+            // Controller'dan ViewBag ile gönderilen veriler kullanılabilir.
+            return View(); // Views/Moderator/Dashboard.cshtml
         }
 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("Identity.Application");
             return RedirectToAction("Login");
         }
     }
