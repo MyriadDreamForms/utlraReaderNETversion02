@@ -26,5 +26,4 @@ cd utlraReaderNETversion02
 dotnet restore
 dotnet run --project utlraReaderNETversion02
 
-# Docker ile
-docker-compose up -d
+
