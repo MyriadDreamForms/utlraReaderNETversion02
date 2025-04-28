@@ -5,9 +5,17 @@ using utlraReaderNETversion02.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Bağlantı dizesini "PostgreSQL" anahtarıyla alıyoruz.
-var connectionString = builder.Configuration.GetConnectionString("PostgreSQL");
-Console.WriteLine($"Alınan Connection String: {connectionString}");
+// Environment Variables'dan oku
+var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "postgres";
+var username = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
+var password = Environment.GetEnvironmentVariable("DB_PASS") ?? "Bolpirasa.123";
+var port = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+
+// Connection string'i kendimiz kuruyoruz
+var connectionString = $"Host={host};Port={port};Database={dbName};Username={username};Password={password}";
+
+Console.WriteLine($"Oluşturulan Connection String: {connectionString}");
 
 // Veritabanı bağlantısını test et
 try
@@ -36,8 +44,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 // ⛔ Cookie ayarları: AccessDenied için yönlendirme ekleniyor!
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Identity/Account/Login";               // Giriş yapılmadıysa buraya yönlendir
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // Giriş var ama yetki yoksa buraya yönlendir
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     options.SlidingExpiration = true;
 });
 
@@ -61,15 +69,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // kimlik doğrulama
-app.UseAuthorization();  // yetkilendirme
+app.UseAuthentication();
+app.UseAuthorization();
 
-// Varsayılan route ayarı
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=WebtoonList}/{action=Index}/{id?}");
 
-// Identity Razor Pages (Identity sayfalarını etkinleştirir)
 app.MapRazorPages();
 
 app.Run();
