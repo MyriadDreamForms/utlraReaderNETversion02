@@ -6,14 +6,28 @@ using utlraReaderNETversion02.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Environment Variables'dan oku
-var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
-var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "postgres";
-var username = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
-var password = Environment.GetEnvironmentVariable("DB_PASS") ?? "Bolpirasa.123";
-var port = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+var host = Environment.GetEnvironmentVariable("DB_HOST");
+var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+var username = Environment.GetEnvironmentVariable("DB_USER");
+var password = Environment.GetEnvironmentVariable("DB_PASS");
+var port = Environment.GetEnvironmentVariable("DB_PORT");
 
-// Connection string'i kendimiz kuruyoruz
+// Eğer ortam değişkenleri yoksa appsettings.json'dan oku
+if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(username))
+{
+    var connectionStringFromConfig = builder.Configuration.GetConnectionString("PostgreSQL");
+    var builderCs = new Npgsql.NpgsqlConnectionStringBuilder(connectionStringFromConfig);
+
+    host = builderCs.Host;
+    dbName = builderCs.Database;
+    username = builderCs.Username;
+    password = builderCs.Password;
+    port = builderCs.Port.ToString();
+}
+
+// Connection string'i oluştur
 var connectionString = $"Host={host};Port={port};Database={dbName};Username={username};Password={password}";
+
 
 Console.WriteLine($"Oluşturulan Connection String: {connectionString}");
 
